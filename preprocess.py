@@ -10,16 +10,16 @@ def generic_labels(doc_labels):
         doc_labels[i] = output_labels
     return doc_labels
 
-def task_splitter(words,labels, num_tasks=5):
+def task_splitter(words,labels,label_list):
     random.seed(42)
-    data=list(zip(words, labels))
-    random.shuffle(data)
-    task_sentences = [[] for _ in range(num_tasks)]
-    task_labels = [[] for _ in range(num_tasks)]
-    for i, (sentence, label) in enumerate(data):
-        task_sentences[i%num_tasks].append(sentence)
-        task_labels[i%num_tasks].append(label)
-    return task_sentences, task_labels
+    tasks = {}
+    for labelx in label_list:
+        tasks[labelx]=[]
+        for word, label in zip(words, labels):
+            if labelx in label:
+                tasks[labelx].append((words, ["O" if l!=labelx else labelx for l in label]))
+        tasks[labelx].shuffle()
+    return tasks
 
             
 

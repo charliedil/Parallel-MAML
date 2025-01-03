@@ -43,32 +43,25 @@ k = 25
 #num_tasks=5
 
 # need each task to be split into a support and query set
-task_words, task_labels = task_splitter(train_words, train_labels, num_tasks=4)# default num_tasks is 5, might have to reduce if not enough GPUs
-tasks_sq = [] 
-for t in range(len(task_words)):
+tasks = task_splitter(train_words, train_labels,list(labels.keys()))# default num_tasks is 5, might have to reduce if not enough GPUs
+tasks_sq = {}
+for t in tasks:
     support = []
     query = []
-    entity_counter=defaultdict(lambda: 0)
-    for s in range(len(task_words[t])):
-        non_o = [x for x in task_labels[t][s] if x!="O"] # everything that's not o
-        if len(non_o)==1: #if there's exactly one entity, we're cooking
-            #this is also a limitation, if we have multiple entities in one
-         # sentence, we don't get to use that sentence. this could be avoidable
-         #future work.
-            if entity_counter[non_o[0]]<k: # if we don't have enough examples
-                entity_counter[non_o[0]]+=1
-                new_task_labels_t_s = [label_to_int[x] for x in task_labels[t][s]]#text to int label
-                support.append((task_words[t][s], new_task_labels_t_s))
-            else:
-                new_task_labels_t_s = [label_to_int[x] for x in task_labels[t][s]]#same here
-                query.append((task_words[t][s], new_task_labels_t_s[:]))
-    tasks_sq.append((support, query))
-
+    supp_counter = 0
+    query_counter = 0
+    for i in range(len(tasks[t])):
+        if i<k:
+            support.append(tasks[t][i])
+        elif i<k*4:
+            query.append(tasks[t][i])
+    tasks_sq[t] = (support, query)
 #now we're cooking
 epochs = 1
 batch_size=25
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased",use_fast=True)
-support, query=tasks_sq[rank]
+support, query=list(tasks_sq.values())[rank]
+train_task = list(tasks_sq.values())[rank]
 support_words = [x[0] for x in support]
 support_labels = [x[1] for x in support]
 query_words = [x[0] for x in query]
@@ -76,7 +69,7 @@ query_labels = [x[1] for x in query]
 
 
 
-result = tokenizer(support_words, is_split_into_words=True, padding=True, truncation=True, max_length=768)#i just picked a random number for length lol
+result = tokenizer(support_words, is_split_into_words=True, padding=True, truncation=True, max_length=768)
 model = NERModel()
 model.to(device)
 optimizer = optim.Adam(model.parameters(), lr=.01)
