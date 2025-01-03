@@ -1,5 +1,7 @@
 # Running Instructions
 
+NOTE: this is made for a specific dataset we're using, I'll make it more generalized in the future
+
 You need 4 tasks and 4 GPUS. I hard coded it to be 4 tasks, if you want 
 you can change it but I don't recommend it. 4 is good.
 
