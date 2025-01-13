@@ -43,7 +43,7 @@ k = 25
 #num_tasks=5
 
 # need each task to be split into a support and query set
-tasks = task_splitter(train_words, train_labels,list(labels.keys()))# default num_tasks is 5, might have to reduce if not enough GPUs
+tasks = task_splitter(train_words, train_labels,list(label_to_int.keys()))# default num_tasks is 5, might have to reduce if not enough GPUs
 tasks_sq = {}
 for t in tasks:
     support = []
