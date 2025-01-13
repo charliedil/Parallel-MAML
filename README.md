@@ -26,7 +26,7 @@ pip install -r requirements.txt
 to run parallel:
 
 ```
-mpiexec -n 4 parallel.py
+mpiexec -n 4 python parallel.py
 ```
 
 to run serial

@@ -17,8 +17,8 @@ def task_splitter(words,labels,label_list):
         tasks[labelx]=[]
         for word, label in zip(words, labels):
             if labelx in label:
-                tasks[labelx].append((words, ["O" if l!=labelx else labelx for l in label]))
-        tasks[labelx].shuffle()
+                tasks[labelx].append((word, ["O" if l!=labelx else labelx for l in label]))
+        random.shuffle(tasks[labelx])
     return tasks
 
             

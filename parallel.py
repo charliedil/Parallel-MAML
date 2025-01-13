@@ -61,14 +61,14 @@ epochs = 1
 batch_size=25
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased",use_fast=True)
 support, query=list(tasks_sq.values())[rank]
-train_task = list(tasks_sq.values())[rank]
 support_words = [x[0] for x in support]
 support_labels = [x[1] for x in support]
 query_words = [x[0] for x in query]
 query_labels = [x[1] for x in query]
-
-
-
+if rank==0:
+    print(len(support_words))
+    print(support_words[0])
+exit()
 result = tokenizer(support_words, is_split_into_words=True, padding=True, truncation=True, max_length=768)
 model = NERModel()
 model.to(device)
