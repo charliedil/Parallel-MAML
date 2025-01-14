@@ -43,7 +43,7 @@ k = 25
 #num_tasks=5
 
 # need each task to be split into a support and query set
-tasks = task_splitter(train_words, train_labels,list(label_to_int.keys()))# default num_tasks is 5, might have to reduce if not enough GPUs
+tasks = task_splitter(train_words, train_labels,[key for key in label_to_int if key!="O"])# default num_tasks is 5, might have to reduce if not enough GPUs
 tasks_sq = {}
 for t in tasks:
     support = []
@@ -65,10 +65,6 @@ support_words = [x[0] for x in support]
 support_labels = [x[1] for x in support]
 query_words = [x[0] for x in query]
 query_labels = [x[1] for x in query]
-if rank==0:
-    print(len(support_words))
-    print(support_words[0])
-exit()
 result = tokenizer(support_words, is_split_into_words=True, padding=True, truncation=True, max_length=768)
 model = NERModel()
 model.to(device)
@@ -87,7 +83,10 @@ for i in range(len(input_ids)):
             newnew_labels.append(-100)
     new_labels.append(newnew_labels)
 support_labels = new_labels
-
+#TODO map back to label ids
+if rank==0:
+    print(support_labels)
+exit()
 support_dataset = TensorDataset(torch.LongTensor(input_ids), torch.LongTensor(attention_mask), torch.LongTensor(support_labels))
 support_dataloader = DataLoader(support_dataset, batch_size=batch_size, shuffle=True)
 
